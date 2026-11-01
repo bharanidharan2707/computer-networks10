@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Topology Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Network Topology Visualizer</h1>
+        <p>Select a topology to view its network structure.</p>
+
+        <select id="topology" onchange="drawTopology()">
+            <option value="star">Star Topology</option>
+            <option value="bus">Bus Topology</option>
+            <option value="ring">Ring Topology</option>
+            <option value="mesh">Mesh Topology</option>
+        </select>
+
+        <h2 id="title">Star Topology</h2>
+
+        <svg id="network" viewBox="0 0 600 400"></svg>
+    </div>
+
+    <script>
+        const svg = document.getElementById("network");
+
+        function drawTopology() {
+            const type = document.getElementById("topology").value;
+            svg.innerHTML = "";
+
+            let nodes = [];
+            let connections = [];
+
+            if (type === "star") {
+                nodes = [
+                    [300, 190, "Switch"],
+                    [100, 70, "PC 1"],
+                    [500, 70, "PC 2"],
+                    [100, 320, "PC 3"],
+                    [500, 320, "PC 4"]
+                ];
+
+                connections = [[0,1],[0,2],[0,3],[0,4]];
+            }
+
+            else if (type === "bus") {
+                nodes = [
+                    [100, 190, "PC 1"],
+                    [230, 190, "PC 2"],
+                    [370, 190, "PC 3"],
+                    [500, 190, "PC 4"]
+                ];
+
+                connections = [[0,1],[1,2],[2,3]];
+            }
+
+            else if (type === "ring") {
+                nodes = [
+                    [300, 60, "PC 1"],
+                    [500, 190, "PC 2"],
+                    [300, 320, "PC 3"],
+                    [100, 190, "PC 4"]
+                ];
+
+                connections = [[0,1],[1,2],[2,3],[3,0]];
+            }
+
+            else if (type === "mesh") {
+                nodes = [
+                    [300, 60, "PC 1"],
+                    [500, 190, "PC 2"],
+                    [300, 320, "PC 3"],
+                    [100, 190, "PC 4"]
+                ];
+
+                connections = [
+                    [0,1],[0,2],[0,3],
+                    [1,2],[1,3],[2,3]
+                ];
+            }
+
+            connections.forEach(([a,b]) => {
+                const line = document.createElementNS(
+                    "http://www.w3.org/2000/svg", "line"
+                );
+
+                line.setAttribute("x1", nodes[a][0]);
+                line.setAttribute("y1", nodes[a][1]);
+                line.setAttribute("x2", nodes[b][0]);
+                line.setAttribute("y2", nodes[b][1]);
+                line.setAttribute("class", "connection");
+
+                svg.appendChild(line);
+            });
+
+            nodes.forEach(([x,y,label]) => {
+                const circle = document.createElementNS(
+                    "http://www.w3.org/2000/svg", "circle"
+                );
+
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("r", 28);
+                circle.setAttribute("class", "node");
+
+                svg.appendChild(circle);
+
+                const text = document.createElementNS(
+                    "http://www.w3.org/2000/svg", "text"
+                );
+
+                text.setAttribute("x", x);
+                text.setAttribute("y", y + 48);
+                text.setAttribute("text-anchor", "middle");
+                text.textContent = label;
+
+                svg.appendChild(text);
+            });
+
+            document.getElementById("title").textContent =
+                type.charAt(0).toUpperCase() + type.slice(1) + " Topology";
+        }
+
+        drawTopology();
+    </script>
+
+</body>
+</html>
